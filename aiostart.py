@@ -1,7 +1,9 @@
 import asyncio
 import logging
 import sys
+from wordBase import ban_words
 from os import getenv
+from routertry import route
 
 from aiogram import Bot, Dispatcher, Router, types
 from aiogram.enums import ParseMode
@@ -9,45 +11,42 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
+# https://mastergroosha.github.io/aiogram-3-guide/filters-and-middlewares/
+
 TOKEN = "6547963288:AAHV3nBO3cHf5HypGjSJYLrKppIF7F7SjK8"
 
-# All handlers should be attached to the Router (or Dispatcher)
-dp = Dispatcher()
 
+dp = Dispatcher()
+dp.include_router(route.router)
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    """
-    This handler receives messages with `/start` command
-    """
-    # Most event objects have aliases for API methods that can be called in events' context
-    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
-    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
-    # method automatically or call API method directly via
-    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
     await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
 
-
+# function for bann users 
+@dp.message_hendler()
+async def ban_users(message: types.Message):
+    user_id = message.from_user.id
+    await bot.kick_chat_member(chat_id=message.chat.id, user_id=user_id)
+    for word in ban_words:
+        if message.text == word:
+            
+            return await message.answer("Вы были забанены, за пиздеж")
+        else:
+            print("не пиздит")
+    
 @dp.message()
-async def echo_handler(message: types.Message) -> None:
-    """
-    Handler will forward receive a message back to the sender
-
-    By default, message handler will handle all message types (like a text, photo, sticker etc.)
-    """
+async def echo_handler(message: types.Message):
     try:
-        # Send a copy of the received message
         await message.answer("<u>Все гуд</u>")
     except TypeError:
-        # But not all the types is supported to be copied so need to handle it
         await message.answer("Nice try!")
 
 
 async def main() -> None:
-    # Initialize Bot instance with a default parse mode which will be passed to all API calls
-    # parse_mode=ParseMode.HTML - for use HTML with text 
+
     bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-    # And the run events dispatching
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 

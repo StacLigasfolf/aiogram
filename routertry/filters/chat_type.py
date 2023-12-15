@@ -10,9 +10,6 @@ class ChatTypeFilter(BaseFilter):
 
     async def __call__(self, message: Message) -> bool: 
         if isinstance(self.chat_type, str):
-            await message.answer("это группа")
-            return message.chat.type == self.chat_type
-             
+            return message.chat.type == self.chat_type             
         else:
-            await message.answer("это не группа")
             return message.chat.type in self.chat_type
