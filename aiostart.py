@@ -7,9 +7,9 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.client import bot
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import Message, update
 from aiogram.utils.markdown import hbold
-
+# from telegram import Update, Chat, ChatMember, ParseMode, ChatMemberUpdated
 from routertry import route
 
 # https://mastergroosha.github.io/aiogram-3-guide/filters-and-middlewares/
@@ -17,6 +17,8 @@ from routertry import route
 TOKEN = "6547963288:AAHV3nBO3cHf5HypGjSJYLrKppIF7F7SjK8"
 
 dp = Dispatcher()
+
+
 # dp.include_router(route.router)
 
 
@@ -33,9 +35,9 @@ async def handle_message(message: types.Message):
         user_id = message.from_user.id
         chat_id = message.chat.id
         # Ban the user
-
-        await bot.BanChatMember(chat_id=chat_id, user_id=user_id)
         await message.reply("You have been banned for using banned words.")
+        await message.bot.ban_chat_member(chat_id, user_id)
+
 
 
 async def main() -> None:
