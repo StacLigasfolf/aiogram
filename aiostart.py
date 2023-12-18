@@ -1,20 +1,22 @@
 import asyncio
 import logging
 import sys
-from aiogram.methods.ban_chat_member import BanChatMember
-from aiogram.methods import BanChatMember
+from os import getenv
+from dotenv import load_dotenv, find_dotenv
+from datetime import timedelta
+from wordBase import ban_words
 from aiogram import Bot, Dispatcher, types
-from aiogram.client import bot
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
-from aiogram.types import Message, update
+from aiogram.types import Message, update, chat_permissions
 from aiogram.utils.markdown import hbold
-# from telegram import Update, Chat, ChatMember, ParseMode, ChatMemberUpdated
+
 from routertry import route
 
-# https://mastergroosha.github.io/aiogram-3-guide/filters-and-middlewares/
+# https://dev.to/mezgoodle/bot-moderator-for-telegram-chats-administrator-actions-pnd
+load_dotenv(find_dotenv())
 
-TOKEN = "6547963288:AAHV3nBO3cHf5HypGjSJYLrKppIF7F7SjK8"
+TOKEN = getenv("TELEGRAM_API_TOKEN")
 
 dp = Dispatcher()
 
@@ -29,15 +31,21 @@ async def command_start_handler(message: Message) -> None:
 
 @dp.message()
 async def handle_message(message: types.Message):
-    banned_words = ["word1", "word2", "word3"]  # List of banned words
-    if any(word in message.text.lower() for word in banned_words):
-        # Get chat and user information
-        user_id = message.from_user.id
-        chat_id = message.chat.id
-        # Ban the user
-        await message.reply("You have been banned for using banned words.")
-        await message.bot.ban_chat_member(chat_id, user_id)
-
+    user_id = message.from_user.id
+    chat_id = message.chat.id
+    ban_time = 40
+    # ban \ kick
+    if any(word in message.text.lower() for word in ban_words.banned_words):
+        await message.reply("Тебя забанило на 40 секунд")
+        await message.bot.ban_chat_member(chat_id, user_id, until_date=timedelta(seconds=ban_time))
+    # mute
+    elif any(word in message.text.lower() for word in ban_words.mute_words):
+        await message.reply("не вырожайся!")
+        await message.bot.restrict_chat_member(chat_id=chat_id, user_id=user_id, until_date=timedelta(seconds=ban_time),
+                                               permissions=chat_permissions.ChatPermissions(can_send_messages=False,
+                                                                                            can_send_polls=False,
+                                                                                            can_send_other_messages=False,
+                                                                                            can_send_media_messages=False))
 
 
 async def main() -> None:
