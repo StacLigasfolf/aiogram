@@ -30,7 +30,10 @@ async def echo(message: Message):
     elif msg == "ссылки":
         await message.answer("<b>Наслаждайтесь</b>", reply_markup=keyboard.button_link)
     elif msg == "лотерея":
-        await message.answer(f"<b>Поздравляю!!! Вы выиграли ${random.randint(0, 1000000)}</b>")
+        loh = ["Владислав", "Толант", "Старая кляча", "Турбо", "Диман базука", "Кирил пездюк", "Свят", "Леха женатый",
+               "Леха подай бургер", "Бородатая Армения", "Италианец", "Никитка бизнес", "Серега Балаха", "Никоглай",
+               "Таргариен", "Д'артаньян"]
+        await message.answer(f"Поздравляю {random.choice(loh)} ты лох!!!")
 
 
 @dp.message()
@@ -38,7 +41,7 @@ async def handle_message(message: types.Message):
     banned_words = ["пидарас", "пидорас", "педик", "пидр", "урод", "падла", "сука", "долбоеб", "долбаеб", "мудак",
                     "конч"]
     mute_words = ["дурак", "дура", "урод", "уродка", "бомж", "бомжара", "бич", "бичара", "вафля", "валаеб", "шараеб",
-                  "хуй", "пизда"]
+                  "хуй", "пизда", 'xуй', "хуила"]
     user_id = message.from_user.id
     chat_id = message.chat.id
     ban_time = 40
